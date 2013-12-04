@@ -724,11 +724,18 @@ namespace Abo
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            AccessHelper _A = new AccessHelper();
-            List<AboTableUDT> UDTlist = _A.Select<AboTableUDT>();
-            _A.DeletedValues(UDTlist); //清除UDT資料
-            dataGridViewX1.Rows.Clear();  //清除datagridview資料
-            LoadLastRecord(); //再次讀入Mapping設定
+            try
+            {
+                AccessHelper _A = new AccessHelper();
+                List<AboTableUDT> UDTlist = _A.Select<AboTableUDT>();
+                _A.DeletedValues(UDTlist); //清除UDT資料
+                dataGridViewX1.Rows.Clear();  //清除datagridview資料
+                LoadLastRecord(); //再次讀入Mapping設定
+            }
+            catch
+            {
+                MessageBox.Show("網路或資料庫異常,請稍後再試...");
+            }
         }
 
         //取得族別代號
