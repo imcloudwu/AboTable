@@ -17,7 +17,7 @@ namespace Abo
 {
     public partial class Form1 : BaseForm
     {
-        Dictionary<String, String> _column2Items; //全部類別對照表,key=TagId,value=prefix+":"+name
+        Dictionary<String, String> _column2Items,_Group; //全部類別對照表,key=TagId,value=prefix+":"+name
         Dictionary<String, List<String>> _mappingData;//mapping資料
         List<myStudent> _CleanList, _ErrorList, 普通科, 綜合高中科, 職業科;
         List<GraduateStudentObj> _GraduateStudentList;
@@ -35,20 +35,27 @@ namespace Abo
 
         private void Column1Prepare()
         {
-            Column1.Items.Add("阿美族");
-            Column1.Items.Add("卑南族");
-            Column1.Items.Add("泰雅族");
-            Column1.Items.Add("排灣族");
-            Column1.Items.Add("布農族");
-            Column1.Items.Add("魯凱族");
-            Column1.Items.Add("賽夏族");
-            Column1.Items.Add("達悟族");
-            Column1.Items.Add("鄒族");
-            Column1.Items.Add("邵族");
-            Column1.Items.Add("噶瑪蘭族");
-            Column1.Items.Add("太魯閣族");
-            Column1.Items.Add("撒奇萊雅族");
-            Column1.Items.Add("賽德克族");
+            _Group = new Dictionary<string, string>();
+            _Group.Add("21","阿美族");
+            _Group.Add("22","泰雅族");
+            _Group.Add("23","排灣族");
+            _Group.Add("24","布農族");
+            _Group.Add("25","卑南族");
+            _Group.Add("26","鄒(曹)族");
+            _Group.Add("27","魯凱族");
+            _Group.Add("28","賽夏族");
+            _Group.Add("29","雅美族");
+            _Group.Add("2A","卲族");
+            _Group.Add("2B","噶嗎蘭族");
+            _Group.Add("2C","太魯閣族");
+            _Group.Add("2D","撒奇萊雅族");
+            _Group.Add("2E","賽德克族");
+            _Group.Add("20","其他");
+
+            foreach(KeyValuePair<String,String> k in _Group)
+            {
+                    Column1.Items.Add(k.Value);
+            }
         }
 
         private void Column2Prepare()
@@ -88,7 +95,14 @@ namespace Abo
                     row = new DataGridViewRow();
                     row.CreateCells(dataGridViewX1);
                     row.Cells[0].Value = UDTlist[i].Target;
-                    row.Cells[1].Value = UDTlist[i].Source;
+                    if (UDTlist[i].Source == "")
+                    {
+                        row.Cells[1].Value = null;
+                    }
+                    else
+                    {
+                        row.Cells[1].Value = UDTlist[i].Source;
+                    }
                     dataGridViewX1.Rows.Add(row);
                 }
             }
@@ -108,9 +122,19 @@ namespace Abo
 
         private void buttonX1_Click(object sender, EventArgs e)
         {
-            SaveMappingRecord();
-            ReadMappingData();
-            DataSetting();
+            try
+            {
+                SaveMappingRecord();
+                ReadMappingData();
+                DataSetting();
+            }
+            catch
+            {
+                MessageBox.Show("網路或資料庫異常,請稍後再試...");
+                this.buttonX1.Enabled = true;
+                this.linkLabel1.Enabled = true;
+                this.dataGridViewX1.Enabled = true;
+            }
         }
 
         public void SaveMappingRecord() //儲存上次Mapping紀錄
@@ -146,15 +170,6 @@ namespace Abo
 
             foreach (DataGridViewRow r in dataGridViewX1.Rows)
             {
-                if (r.Cells[0].Value != null)
-                {
-                    String group = r.Cells[0].Value.ToString();
-                    if (!_mappingData.ContainsKey(group))
-                    {
-                        _mappingData.Add(group, new List<string>());
-                    }
-                }
-
                 if (r.Cells[0].Value != null && r.Cells[1].Value != null)  //欄位有空值跳下一行
                 {
                     String id = "";
@@ -209,7 +224,7 @@ namespace Abo
         {
             FISCA.Presentation.MotherForm.SetStatusBarMessage("正在產生原住民學生數及畢業生統計表...");
             this.buttonX1.Enabled = false;
-            this.buttonX2.Enabled = false;
+            this.linkLabel1.Enabled = false;
             this.dataGridViewX1.Enabled = false;
             _BGWClassStudentAbsenceDetail = new BackgroundWorker();
             _BGWClassStudentAbsenceDetail.DoWork += new DoWorkEventHandler(_BGWClassStudentAbsenceDetail_DoWork);
@@ -220,7 +235,7 @@ namespace Abo
         private void _BGWClassStudentAbsenceDetail_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
             this.buttonX1.Enabled = true;
-            this.buttonX2.Enabled = true;
+            this.linkLabel1.Enabled = true;
             this.dataGridViewX1.Enabled = true;
             FISCA.Presentation.MotherForm.SetStatusBarMessage("產生 原住民學生數及畢業生統計表 已完成");
 
@@ -322,6 +337,7 @@ namespace Abo
             Dictionary<String, List<myStudent>> dica = getStudentDic(普通科);
             foreach (KeyValuePair<String, List<myStudent>> k in dica)
             {
+                cs[index, 0].PutValue(getGroupCode(k.Key));
                 cs[index, 1].PutValue(k.Key);
                 cs[index, 2].PutValue(getStudentCount(k.Value));
                 cs[index, 3].PutValue(getStudentCount(k.Value, "0", "1"));
@@ -353,6 +369,7 @@ namespace Abo
             Dictionary<String, List<myStudent>> dicb = getStudentDic(綜合高中科);
             foreach (KeyValuePair<String, List<myStudent>> k in dicb)
             {
+                cs[index, 0].PutValue(getGroupCode(k.Key));
                 cs[index, 1].PutValue(k.Key);
                 cs[index, 2].PutValue(getStudentCount(k.Value));
                 cs[index, 3].PutValue(getStudentCount(k.Value, "0", "1"));
@@ -384,6 +401,7 @@ namespace Abo
             Dictionary<String, List<myStudent>> dicc = getStudentDic(職業科);
             foreach (KeyValuePair<String, List<myStudent>> k in dicc)
             {
+                cs[index, 0].PutValue(getGroupCode(k.Key));
                 cs[index, 1].PutValue(k.Key);
                 cs[index, 2].PutValue(getStudentCount(k.Value));
                 cs[index, 3].PutValue(getStudentCount(k.Value, "0", "1"));
@@ -704,13 +722,27 @@ namespace Abo
             this.Close();
         }
 
-        private void buttonX2_Click(object sender, EventArgs e)
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             AccessHelper _A = new AccessHelper();
             List<AboTableUDT> UDTlist = _A.Select<AboTableUDT>();
             _A.DeletedValues(UDTlist); //清除UDT資料
             dataGridViewX1.Rows.Clear();  //清除datagridview資料
             LoadLastRecord(); //再次讀入Mapping設定
+        }
+
+        //取得族別代號
+        private String getGroupCode(String groupName)
+        {
+            String code = "";
+            foreach(KeyValuePair<String,String> k in _Group)
+            {
+                if(k.Value == groupName)
+                {
+                    code = k.Key;
+                }
+            }
+            return code;
         }
     }
 }
