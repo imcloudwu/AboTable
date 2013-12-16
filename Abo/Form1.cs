@@ -19,6 +19,7 @@ namespace Abo
     {
         Dictionary<String, String> _column2Items,_Group; //全部類別對照表,key=TagId,value=prefix+":"+name
         Dictionary<String, List<String>> _mappingData;//mapping資料
+        List<String> _TagIDList; //被選取到的TagID總表,排除學生清單用
         List<myStudent> _CleanList, _ErrorList, 普通科, 綜合高中科, 職業科;
         List<GraduateStudentObj> _GraduateStudentList;
         private BackgroundWorker _BGWClassStudentAbsenceDetail; //背景模式
@@ -126,6 +127,7 @@ namespace Abo
             {
                 SaveMappingRecord();
                 ReadMappingData();
+                SetTagIDList();
                 DataSetting();
             }
             catch
@@ -274,13 +276,14 @@ namespace Abo
             QueryHelper _Q = new QueryHelper();
 
             //SQL查詢要求的年級資料
-            DataTable dt = _Q.Select("select student.id,student.name,student.gender,student.ref_class_id,student.status,class.class_name,class.grade_year,dept.name as dept_name,tag_student.ref_tag_id from student left join class on student.ref_class_id=class.id left join dept on class.ref_dept_id=dept.id left join tag_student on student.id= tag_student.ref_student_id where student.status in ('1','2','16')");
+            DataTable dt = _Q.Select("select student.id,student.name,student.student_number,student.gender,student.ref_class_id,student.status,class.class_name,class.grade_year,dept.name as dept_name,tag_student.ref_tag_id from student left join class on student.ref_class_id=class.id left join dept on class.ref_dept_id=dept.id left join tag_student on student.id= tag_student.ref_student_id where student.status in ('1','2','16')");
 
             //建立myStuden物件放至List中
             foreach (DataRow row in dt.Rows)
             {
                 String id = row["id"].ToString();
                 String name = row["name"].ToString();
+                String student_number = row["student_number"].ToString();
                 String gender = row["gender"].ToString();
                 String ref_class_id = row["ref_class_id"].ToString();
                 String class_name = row["class_name"].ToString();
@@ -290,7 +293,7 @@ namespace Abo
                 String status = row["status"].ToString();
                 if (!myDic.ContainsKey(id)) //ID當key,不存在就建立
                 {
-                    myDic.Add(id, new myStudent(id, name, gender, ref_class_id, class_name, grade_year, dept_name,status, new List<string>()));
+                    myDic.Add(id, new myStudent(id, name, student_number, gender, ref_class_id, class_name, grade_year, dept_name, status, new List<string>()));
                 }
                 myDic[id].Tag.Add(ref_tag_id);
             }
@@ -309,6 +312,9 @@ namespace Abo
 
             foreach (myStudent s in list)
             {
+                if (!TagIDExistence(s)) continue; //無資料不需要加入就換下一個學生
+
+                //按照資料的正確性分別加入Error或CleanList
                 if (s.Id == "" || s.Name == "" || (s.Gender != "0" && s.Gender != "1") || s.Ref_class_id == "" || s.Class_name == "" || s.Grade_year == "" || s.Dept_name == "")
                 {
                     _ErrorList.Add(s);
@@ -428,7 +434,7 @@ namespace Abo
             ws = _wk.Worksheets[3];
             ws.Name = "異常資料表";
             cs = ws.Cells;
-            cs["A1"].PutValue("系統編號");
+            cs["A1"].PutValue("學號");
             cs["B1"].PutValue("姓名");
             cs["C1"].PutValue("性別");
             cs["D1"].PutValue("班級名稱");
@@ -437,7 +443,7 @@ namespace Abo
             index = 1;
             foreach (myStudent s in _ErrorList)
             {
-                cs[index, 0].PutValue(s.Id);
+                cs[index, 0].PutValue(s.Student_number);
                 cs[index, 1].PutValue(s.Name);
                 cs[index, 2].PutValue(s.Gender);
                 cs[index, 3].PutValue(s.Class_name);
@@ -750,6 +756,34 @@ namespace Abo
                 }
             }
             return code;
+        }
+
+        //儲存被選取的TagID
+        private void SetTagIDList()
+        {
+            _TagIDList = new List<string>();
+            foreach(String key in _mappingData.Keys)
+            {
+                foreach(String tagid in _mappingData[key])
+                {
+                    _TagIDList.Add(tagid);
+                }
+            }
+        }
+
+        //檢查該學生的tagid是否在清單中
+        private bool TagIDExistence(myStudent student)
+        {
+            bool addOrNot = false;  //是否加入清單的判斷值
+            foreach (String tagid in student.Tag)
+            {
+                if (_TagIDList.Contains(tagid)) //查詢此學生的tagid是否有在_TagIDLIst中,若有代表需要這筆資料
+                {
+                    addOrNot = true;
+                    break; //有找到即可跳離,無須再比對後續tagid
+                }
+            }
+            return addOrNot;
         }
     }
 }

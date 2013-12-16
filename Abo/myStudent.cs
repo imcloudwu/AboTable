@@ -9,14 +9,15 @@ namespace Abo
     class myStudent
     {
         //學生物件存放個資料
-        private String id, name, gender, ref_class_id, class_name, grade_year, dept_name, status;
+        private String id, name, student_number, gender, ref_class_id, class_name, grade_year, dept_name, status;
 
         private List<String> tag;
 
-        public myStudent(String id, String name, String gender, String ref_class_id, String class_name, String grade_year, String dept_name, String status, List<String> tag)
+        public myStudent(String id, String name, String student_number, String gender, String ref_class_id, String class_name, String grade_year, String dept_name, String status, List<String> tag)
         {
             this.id = id;
             this.name = name;
+            this.student_number = student_number;
             this.gender = gender;
             this.ref_class_id = ref_class_id;
             this.class_name = class_name;
@@ -37,6 +38,12 @@ namespace Abo
         {
             get { return name; }
             set { name = value; }
+        }
+
+        public String Student_number
+        {
+            get { return student_number; }
+            set { student_number = value; }
         }
 
         public String Gender

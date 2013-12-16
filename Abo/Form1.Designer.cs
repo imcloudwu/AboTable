@@ -28,13 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dataGridViewX1 = new DevComponents.DotNetBar.Controls.DataGridViewX();
-            this.Column1 = new DevComponents.DotNetBar.Controls.DataGridViewComboBoxExColumn();
-            this.Column2 = new DevComponents.DotNetBar.Controls.DataGridViewComboBoxExColumn();
             this.buttonX1 = new DevComponents.DotNetBar.ButtonX();
             this.buttonX3 = new DevComponents.DotNetBar.ButtonX();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
+            this.Column1 = new Abo.DataGridViewComboBoxExColumn();
+            this.Column2 = new Abo.DataGridViewComboBoxExColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewX1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -45,50 +45,20 @@
             this.dataGridViewX1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Column1,
             this.Column2});
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("微軟正黑體", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridViewX1.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("微軟正黑體", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridViewX1.DefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridViewX1.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(215)))), ((int)(((byte)(229)))));
             this.dataGridViewX1.Location = new System.Drawing.Point(13, 13);
             this.dataGridViewX1.Name = "dataGridViewX1";
             this.dataGridViewX1.RowTemplate.Height = 24;
             this.dataGridViewX1.Size = new System.Drawing.Size(379, 244);
             this.dataGridViewX1.TabIndex = 0;
-            // 
-            // Column1
-            // 
-            this.Column1.DisplayMember = "Text";
-            this.Column1.DropDownHeight = 106;
-            this.Column1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.Column1.DropDownWidth = 121;
-            this.Column1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.Column1.HeaderText = "標記";
-            this.Column1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.Column1.IntegralHeight = false;
-            this.Column1.ItemHeight = 17;
-            this.Column1.Name = "Column1";
-            this.Column1.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.Column1.Width = 150;
-            // 
-            // Column2
-            // 
-            this.Column2.DisplayMember = "Text";
-            this.Column2.DropDownHeight = 106;
-            this.Column2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.Column2.DropDownWidth = 121;
-            this.Column2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.Column2.HeaderText = "來源";
-            this.Column2.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.Column2.IntegralHeight = false;
-            this.Column2.ItemHeight = 17;
-            this.Column2.Name = "Column2";
-            this.Column2.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.Column2.Width = 175;
             // 
             // buttonX1
             // 
@@ -128,11 +98,23 @@
             this.linkLabel1.Text = "重設";
             this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
             // 
+            // Column1
+            // 
+            this.Column1.HeaderText = "標記";
+            this.Column1.Name = "Column1";
+            this.Column1.Width = 150;
+            // 
+            // Column2
+            // 
+            this.Column2.HeaderText = "來源";
+            this.Column2.Name = "Column2";
+            this.Column2.Width = 175;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(404, 298);
+            this.ClientSize = new System.Drawing.Size(409, 298);
             this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.buttonX3);
             this.Controls.Add(this.buttonX1);
@@ -151,8 +133,8 @@
         private DevComponents.DotNetBar.Controls.DataGridViewX dataGridViewX1;
         private DevComponents.DotNetBar.ButtonX buttonX1;
         private DevComponents.DotNetBar.ButtonX buttonX3;
-        private DevComponents.DotNetBar.Controls.DataGridViewComboBoxExColumn Column1;
-        private DevComponents.DotNetBar.Controls.DataGridViewComboBoxExColumn Column2;
         private System.Windows.Forms.LinkLabel linkLabel1;
+        private Abo.DataGridViewComboBoxExColumn Column1;
+        private Abo.DataGridViewComboBoxExColumn Column2;
     }
 }
