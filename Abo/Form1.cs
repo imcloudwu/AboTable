@@ -21,7 +21,7 @@ namespace Abo
         Dictionary<String, List<String>> _mappingData;//mapping資料
         List<String> _TagIDList; //被選取到的TagID總表,排除學生清單用
         List<myStudent> _CleanList, _ErrorList, 普通科, 綜合高中科, 職業科;
-        List<GraduateStudentObj> _GraduateStudentList;
+        List<GraduateStudentObj> _GraduateStudentList,_GCleanList, _GErrorList;
         private BackgroundWorker _BGWClassStudentAbsenceDetail; //背景模式
         Workbook _wk;
         String _SchoolYear;
@@ -250,9 +250,9 @@ namespace Abo
                 try
                 {
                     _wk.Save(sd.FileName);
-                    if (_ErrorList.Count > 0)
+                    if ((_ErrorList.Count + _GErrorList.Count)> 0)
                     {
-                        MessageBox.Show("發現" + _ErrorList.Count + "筆異常資料未列入統計\r\n詳細資料請確認報表中的[異常資料表]");
+                        MessageBox.Show("發現" + (_ErrorList.Count + _GErrorList.Count) + "筆異常資料未列入統計\r\n詳細資料請確認報表中的[異常資料表]");
                     }
                     System.Diagnostics.Process.Start(sd.FileName);
 
@@ -276,7 +276,7 @@ namespace Abo
             QueryHelper _Q = new QueryHelper();
 
             //SQL查詢要求的年級資料
-            DataTable dt = _Q.Select("select student.id,student.name,student.student_number,student.gender,student.ref_class_id,student.status,class.class_name,class.grade_year,dept.name as dept_name,tag_student.ref_tag_id from student left join class on student.ref_class_id=class.id left join dept on class.ref_dept_id=dept.id left join tag_student on student.id= tag_student.ref_student_id where student.status in ('1','2','16')");
+            DataTable dt = _Q.Select("select student.id,student.name,student.student_number,student.gender,student.ref_class_id,student.status,class.class_name,class.grade_year,dept.name as dept_name,tag_student.ref_tag_id from student left join class on student.ref_class_id=class.id left join dept on class.ref_dept_id=dept.id left join tag_student on student.id= tag_student.ref_student_id where student.status in ('1','2')");
 
             //建立myStuden物件放至List中
             foreach (DataRow row in dt.Rows)
@@ -440,6 +440,7 @@ namespace Abo
             cs["D1"].PutValue("班級名稱");
             cs["E1"].PutValue("年級");
             cs["F1"].PutValue("科別名稱");
+            cs["G1"].PutValue("狀態");
             index = 1;
             foreach (myStudent s in _ErrorList)
             {
@@ -449,7 +450,17 @@ namespace Abo
                 cs[index, 3].PutValue(s.Class_name);
                 cs[index, 4].PutValue(s.Grade_year);
                 cs[index, 5].PutValue(s.Dept_name);
+                cs[index, 6].PutValue(s.Status == "1"?"一般生":"延修生");
                 index++;
+            }
+
+            foreach(GraduateStudentObj obj in _GErrorList)
+            {
+                cs[index, 0].PutValue(obj.Student_number);
+                cs[index, 1].PutValue(obj.Name);
+                cs[index, 2].PutValue(obj.Gender);
+                cs[index, 5].PutValue(obj.Dept);
+                cs[index, 6].PutValue("畢業或離校生");
             }
 
             //cs["A1"].PutValue("ID");
@@ -625,25 +636,42 @@ namespace Abo
         //取得上學年畢業生物件清單
         private List<GraduateStudentObj> getGraduateStudent()
         {
+            _GCleanList = new List<GraduateStudentObj>();
+            _GErrorList = new List<GraduateStudentObj>();
             int year = Convert.ToInt32(_SchoolYear) - 1; //當前系統學年度-1
             Dictionary<String, GraduateStudentObj> dic = new Dictionary<string, GraduateStudentObj>();
             FISCA.Data.QueryHelper _Q = new FISCA.Data.QueryHelper();
-            DataTable dt = _Q.Select("select update_record.ref_student_id,update_record.ss_name,update_record.ss_gender,update_record.ss_dept,tag_student.ref_tag_id from update_record left join tag_student on update_record.ref_student_id = tag_student.ref_student_id where update_code='501' and school_year='" + year + "'");
+            DataTable dt = _Q.Select("select update_record.ref_student_id,update_record.ss_name,student.student_number,update_record.ss_gender,update_record.ss_dept,tag_student.ref_tag_id from update_record left join tag_student on update_record.ref_student_id = tag_student.ref_student_id left join student on update_record.ref_student_id=student.id where update_code='501' and school_year='"+ year +"'");
 
             foreach (DataRow row in dt.Rows)
             {
                 String id = row["ref_student_id"].ToString();
                 String name = row["ss_name"].ToString();
+                String student_number = row["student_number"].ToString();
                 String gender = row["ss_gender"].ToString();
                 String dept = row["ss_dept"].ToString();
                 String tagid = row["ref_tag_id"].ToString();
                 if(!dic.ContainsKey(id))
                 {
-                    dic.Add(id, new GraduateStudentObj(id,name,gender,dept,new List<String>()));
+                    dic.Add(id, new GraduateStudentObj(id, name, student_number,gender, dept, new List<String>()));
                 }
                 dic[id].TagID.Add(tagid);
             }
-            return dic.Values.ToList();
+
+            //判斷性別欄位是否異常
+            foreach(String id in dic.Keys)
+            {
+                if(dic[id].Gender != "1" && dic[id].Gender != "0")
+                {
+                    _GErrorList.Add(dic[id]);
+                }
+                else
+                {
+                    _GCleanList.Add(dic[id]);
+                }
+            }
+
+            return _GCleanList;
         }
 
         //取得指定族別科別的上屆畢業生清單

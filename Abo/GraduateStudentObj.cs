@@ -11,14 +11,16 @@ namespace Abo
     {
         public string ID { get; set; }
         public string Name { get; set; }
+        public string Student_number { get; set; }
         public string Gender { get; set; }
         public string Dept { get; set; }
         public List<String> TagID { get; set; }
 
-        public GraduateStudentObj(String ID,String Name,String Gender,String Dept,List<String> TagID)
+        public GraduateStudentObj(String ID, String Name, String Student_number, String Gender, String Dept, List<String> TagID)
         {
             this.ID = ID;
             this.Name = Name;
+            this.Student_number = Student_number;
             this.Gender = Gender;
             this.Dept = Dept;
             this.TagID = TagID;
